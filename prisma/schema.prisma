@@ -37,6 +37,8 @@ enum Role {
 model Batch {
   id            String   @id @default(cuid())
   name          String
+  code          String   @unique
+  maxStudents   Int?
   institutionId String
   createdAt     DateTime @default(now())
 
@@ -91,11 +93,4 @@ enum AttendanceStatus {
   PRESENT
   ABSENT
   LATE
-}
-
-model Invite {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  batchId   String
-  createdAt DateTime @default(now())
 }
