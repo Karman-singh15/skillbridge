@@ -11,3 +11,91 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+
+model User {
+  id             String   @id @default(cuid())
+  clerkUserId    String   @unique
+  name           String
+  email          String   @unique
+  role           Role
+  institutionId  String?
+  createdAt      DateTime @default(now())
+
+  sessions       Session[] @relation("TrainerSessions")
+  attendance     Attendance[]
+}
+
+enum Role {
+  STUDENT
+  TRAINER
+  INSTITUTION
+  PROGRAMME_MANAGER
+  MONITORING_OFFICER
+}
+
+model Batch {
+  id            String   @id @default(cuid())
+  name          String
+  institutionId String
+  createdAt     DateTime @default(now())
+
+  sessions      Session[]
+  trainers      BatchTrainer[]
+  students      BatchStudent[]
+}
+
+model BatchTrainer {
+  id        String @id @default(cuid())
+  batchId   String
+  trainerId String
+
+  batch     Batch @relation(fields: [batchId], references: [id])
+}
+
+model BatchStudent {
+  id        String @id @default(cuid())
+  batchId   String
+  studentId String
+
+  batch     Batch @relation(fields: [batchId], references: [id])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  batchId   String
+  trainerId String
+  title     String
+  date      DateTime
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+
+  batch      Batch @relation(fields: [batchId], references: [id])
+  trainer    User  @relation("TrainerSessions", fields: [trainerId], references: [id])
+  attendance Attendance[]
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  sessionId String
+  studentId String
+  status    AttendanceStatus
+  markedAt  DateTime @default(now())
+
+  session   Session @relation(fields: [sessionId], references: [id])
+  student   User    @relation(fields: [studentId], references: [id])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+model Invite {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  batchId   String
+  createdAt DateTime @default(now())
+}
