@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createBatch, createSession } from "./actions";
+import { TimePickerScroll } from "./time-picker-scroll";
+
 
 interface BatchData {
   id: string;
@@ -9,6 +11,14 @@ interface BatchData {
   code: string;
   maxStudents: number | null;
   studentCount: number;
+}
+
+interface StudentAttendance {
+  id: string;
+  name: string;
+  email: string;
+  status: string; // "PRESENT" | "LATE" | "UNMARKED"
+  markedAt: string | null;
 }
 
 interface SessionData {
@@ -19,6 +29,7 @@ interface SessionData {
   endTime: string;
   batchName: string;
   attendanceCount: number;
+  students: StudentAttendance[];
 }
 
 interface TrainerClientProps {
@@ -37,12 +48,47 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
 
   const [sessionTitle, setSessionTitle] = useState("");
   const [sessionDate, setSessionDate] = useState("");
-  const [sessionStart, setSessionStart] = useState("");
-  const [sessionEnd, setSessionEnd] = useState("");
+  const [sessionStart, setSessionStart] = useState("09:00");
+  const [sessionEnd, setSessionEnd] = useState("10:00");
   const [sessionBatchId, setSessionBatchId] = useState("");
   const [sessionLoading, setSessionLoading] = useState(false);
 
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+
   const [errors, setErrors] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    if (!showStartPicker && !showEndPicker) return;
+    const handleOutsideClick = () => {
+      setShowStartPicker(false);
+      setShowEndPicker(false);
+    };
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [showStartPicker, showEndPicker]);
+
+  function formatTo12Hour(time24: string): string {
+    if (!time24 || !time24.includes(":")) return "";
+    const [hStr, mStr] = time24.split(":");
+    let hNum = parseInt(hStr, 10);
+    const m = mStr || "00";
+    let period = "AM";
+
+    if (hNum >= 12) {
+      period = "PM";
+      if (hNum > 12) {
+        hNum -= 12;
+      }
+    } else if (hNum === 0) {
+      hNum = 12;
+    }
+
+    const h = hNum.toString().padStart(2, "0");
+    return `${h}:${m} ${period}`;
+  }
+
 
   async function handleCreateBatch(e: React.FormEvent) {
     e.preventDefault();
@@ -100,16 +146,19 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
         endTime: res.session.endTime,
         batchName: selectedBatchName,
         attendanceCount: 0,
+        students: [],
       };
       setSessions([newSession, ...sessions]);
       // Clear session form
       setSessionTitle("");
       setSessionDate("");
-      setSessionStart("");
-      setSessionEnd("");
+      setSessionStart("09:00");
+      setSessionEnd("10:00");
       setSessionBatchId("");
     }
   }
+
+  const selectedSession = sessions.find((s) => s.id === selectedSessionId);
 
 
 
@@ -204,7 +253,12 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
               Please create a batch first before scheduling sessions.
             </p>
           ) : (
-            <form onSubmit={handleCreateSession} className="space-y-4">
+            <form
+              onSubmit={handleCreateSession}
+              className={`space-y-4 transition-all duration-300 ${
+                showStartPicker || showEndPicker ? "pb-44" : "pb-0"
+              }`}
+            >
               {errors.session?.global && (
                 <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl">
                   {errors.session.global[0]}
@@ -269,37 +323,70 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label htmlFor="session-start-input" className="block text-xs font-semibold text-zinc-400 mb-2">
-                      Start (HH:MM)
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="relative">
+                    <label className="block text-xs font-semibold text-zinc-400 mb-2">
+                      Start Time
                     </label>
-                    <input
-                      id="session-start-input"
-                      type="text"
-                      required
-                      placeholder="09:00"
-                      value={sessionStart}
-                      onChange={(e) => setSessionStart(e.target.value)}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
-                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowStartPicker(!showStartPicker);
+                        setShowEndPicker(false);
+                      }}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-left text-zinc-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all flex justify-between items-center cursor-pointer"
+                    >
+                      <span>{formatTo12Hour(sessionStart) || "09:00 AM"}</span>
+                      <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {showStartPicker && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute left-0 mt-2 z-50 flex justify-center min-w-[240px] md:min-w-[260px]"
+                      >
+                        <TimePickerScroll
+                          value={sessionStart}
+                          onChange={(val) => setSessionStart(val)}
+                        />
+                      </div>
+                    )}
                     {errors.session?.startTime && (
                       <p className="text-red-400 text-xs mt-1">{errors.session.startTime[0]}</p>
                     )}
                   </div>
-                  <div>
-                    <label htmlFor="session-end-input" className="block text-xs font-semibold text-zinc-400 mb-2">
-                      End (HH:MM)
+
+                  <div className="relative">
+                    <label className="block text-xs font-semibold text-zinc-400 mb-2">
+                      End Time
                     </label>
-                    <input
-                      id="session-end-input"
-                      type="text"
-                      required
-                      placeholder="11:30"
-                      value={sessionEnd}
-                      onChange={(e) => setSessionEnd(e.target.value)}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
-                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowEndPicker(!showEndPicker);
+                        setShowStartPicker(false);
+                      }}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-left text-zinc-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all flex justify-between items-center cursor-pointer"
+                    >
+                      <span>{formatTo12Hour(sessionEnd) || "10:00 AM"}</span>
+                      <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {showEndPicker && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute right-0 mt-2 z-50 flex justify-center min-w-[240px] md:min-w-[260px]"
+                      >
+                        <TimePickerScroll
+                          value={sessionEnd}
+                          onChange={(val) => setSessionEnd(val)}
+                        />
+                      </div>
+                    )}
                     {errors.session?.endTime && (
                       <p className="text-red-400 text-xs mt-1">{errors.session.endTime[0]}</p>
                     )}
@@ -328,14 +415,15 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
               {sessions.map((session) => (
                 <div
                   key={session.id}
-                  className="p-4 bg-zinc-950/40 border border-zinc-900 hover:border-zinc-850 rounded-2xl flex justify-between items-center"
+                  onClick={() => setSelectedSessionId(session.id)}
+                  className="p-4 bg-zinc-950/40 border border-zinc-900 hover:border-emerald-500/30 hover:bg-zinc-950/80 rounded-2xl flex justify-between items-center cursor-pointer transition-all"
                 >
                   <div>
                     <h3 className="font-bold text-zinc-200 text-sm">{session.title}</h3>
                     <div className="flex gap-4 text-xs text-zinc-500 mt-1">
                       <span>Batch: <strong className="text-zinc-400">{session.batchName}</strong></span>
                       <span>Date: {session.date}</span>
-                      <span>{session.startTime} - {session.endTime}</span>
+                      <span>{formatTo12Hour(session.startTime)} - {formatTo12Hour(session.endTime)}</span>
                     </div>
                   </div>
                   <div className="text-xs text-zinc-500 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-850">
@@ -347,6 +435,106 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
           )}
         </div>
       </div>
+
+      {/* Attendance Detail Modal */}
+      {selectedSession && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-950 border border-zinc-850 rounded-3xl p-6 w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl space-y-6">
+            
+            {/* Header */}
+            <div className="flex justify-between items-start border-b border-zinc-900 pb-4">
+              <div>
+                <h3 className="text-xl font-bold text-zinc-100">{selectedSession.title}</h3>
+                <p className="text-xs text-zinc-400 mt-1">
+                  Batch: <strong className="text-emerald-400">{selectedSession.batchName}</strong> • Date: {selectedSession.date} • {formatTo12Hour(selectedSession.startTime)} - {formatTo12Hour(selectedSession.endTime)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedSessionId(null)}
+                className="text-zinc-500 hover:text-zinc-300 p-1.5 hover:bg-zinc-900 rounded-xl transition-all cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Attendance Summaries */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-zinc-900/40 border border-zinc-900 p-3 rounded-2xl text-center">
+                <span className="text-[10px] text-zinc-500 uppercase font-extrabold tracking-wider">On Time</span>
+                <p className="text-xl font-bold text-emerald-400 mt-1">
+                  {selectedSession.students.filter(s => s.status === "PRESENT").length}
+                </p>
+              </div>
+              <div className="bg-zinc-900/40 border border-zinc-900 p-3 rounded-2xl text-center">
+                <span className="text-[10px] text-zinc-500 uppercase font-extrabold tracking-wider">Late</span>
+                <p className="text-xl font-bold text-amber-400 mt-1">
+                  {selectedSession.students.filter(s => s.status === "LATE").length}
+                </p>
+              </div>
+              <div className="bg-zinc-900/40 border border-zinc-900 p-3 rounded-2xl text-center">
+                <span className="text-[10px] text-zinc-500 uppercase font-extrabold tracking-wider">Unmarked</span>
+                <p className="text-xl font-bold text-zinc-400 mt-1">
+                  {selectedSession.students.filter(s => s.status === "UNMARKED").length}
+                </p>
+              </div>
+            </div>
+
+            {/* Student Table/List */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-none">
+              {selectedSession.students.length === 0 ? (
+                <p className="text-zinc-500 text-sm text-center py-10">No students enrolled in this batch.</p>
+              ) : (
+                selectedSession.students.map((student) => (
+                  <div
+                    key={student.id}
+                    className="p-3 bg-zinc-950/80 border border-zinc-900 hover:border-zinc-800 rounded-2xl flex items-center justify-between transition-all"
+                  >
+                    <div>
+                      <h4 className="text-sm font-bold text-zinc-200">{student.name}</h4>
+                      <p className="text-xs text-zinc-500 mt-0.5">{student.email}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {student.markedAt && (
+                        <span className="text-[10px] text-zinc-500 font-medium hidden sm:inline">
+                          At {new Date(student.markedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide border ${
+                          student.status === "PRESENT"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
+                            : student.status === "LATE"
+                            ? "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                            : "bg-zinc-900 text-zinc-500 border-zinc-850"
+                        }`}
+                      >
+                        {student.status === "PRESENT"
+                          ? "ON TIME"
+                          : student.status}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end pt-2 border-t border-zinc-900">
+              <button
+                type="button"
+                onClick={() => setSelectedSessionId(null)}
+                className="px-5 py-2 bg-zinc-900 hover:bg-zinc-850 text-zinc-200 hover:text-zinc-100 font-bold rounded-xl text-xs transition-all cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -39,11 +39,30 @@ export default async function TrainerDashboard() {
     studentCount: bt.batch.students.length,
   }));
 
+  // Get all unique student IDs in all batches of this trainer
+  const studentIds = Array.from(
+    new Set(batchTrainers.flatMap((bt) => bt.batch.students.map((s) => s.studentId)))
+  );
+
+  // Fetch student user details (name, email)
+  const students = await prisma.user.findMany({
+    where: { id: { in: studentIds } },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  });
+
   // Query sessions created by this trainer
   const sessions = await prisma.session.findMany({
     where: { trainerId: dbUser.id },
     include: {
-      batch: true,
+      batch: {
+        include: {
+          students: true,
+        },
+      },
       attendance: true,
     },
     orderBy: {
@@ -51,15 +70,31 @@ export default async function TrainerDashboard() {
     },
   });
 
-  const mappedSessions = sessions.map((s) => ({
-    id: s.id,
-    title: s.title,
-    date: s.date.toISOString().split("T")[0],
-    startTime: s.startTime,
-    endTime: s.endTime,
-    batchName: s.batch.name,
-    attendanceCount: s.attendance.length,
-  }));
+  const mappedSessions = sessions.map((s) => {
+    // Map students in the target batch of this session
+    const studentList = s.batch.students.map((bs) => {
+      const studentUser = students.find((std) => std.id === bs.studentId);
+      const att = s.attendance.find((a) => a.studentId === bs.studentId);
+      return {
+        id: bs.studentId,
+        name: studentUser?.name || "Unknown Student",
+        email: studentUser?.email || "",
+        status: att ? att.status : "UNMARKED",
+        markedAt: att ? att.markedAt.toISOString() : null,
+      };
+    });
+
+    return {
+      id: s.id,
+      title: s.title,
+      date: s.date.toISOString().split("T")[0],
+      startTime: s.startTime,
+      endTime: s.endTime,
+      batchName: s.batch.name,
+      attendanceCount: s.attendance.length,
+      students: studentList,
+    };
+  });
 
   return (
     <div className="space-y-8">

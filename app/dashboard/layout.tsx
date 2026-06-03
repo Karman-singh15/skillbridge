@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { RoleSwitcher } from "./role-switcher";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,10 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   if (!dbUser) {
     redirect("/onboarding");
   }
+
+  const isAdmin =
+    dbUser.email.toLowerCase().includes("admin") ||
+    dbUser.name.toLowerCase().includes("admin");
 
   // Human-readable role tags
   const roleLabels: Record<string, string> = {
@@ -66,6 +71,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
           </div>
 
           <div className="flex items-center gap-4">
+            {isAdmin && <RoleSwitcher currentRole={dbUser.role} />}
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-zinc-100">{dbUser.name}</p>
               <p className="text-xs text-zinc-500">{dbUser.email}</p>

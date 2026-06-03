@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/router"; // wait, Next.js App Router uses next/navigation!
+import Link from "next/link";
 import { useRouter as useAppRouter } from "next/navigation";
 import { joinBatch } from "./actions";
 
-export function JoinBatchForm() {
+interface JoinBatchFormProps {
+  showCancel?: boolean;
+  cancelHref?: string;
+}
+
+export function JoinBatchForm({ showCancel, cancelHref }: JoinBatchFormProps) {
   const router = useAppRouter();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +73,15 @@ export function JoinBatchForm() {
         >
           {loading ? "Joining Batch..." : "Join Batch"}
         </button>
+
+        {showCancel && cancelHref && (
+          <Link
+            href={cancelHref}
+            className="w-full py-2 bg-transparent text-zinc-500 hover:text-zinc-300 font-semibold text-xs transition-all text-center mt-2 block"
+          >
+            Cancel
+          </Link>
+        )}
       </form>
     </div>
   );
