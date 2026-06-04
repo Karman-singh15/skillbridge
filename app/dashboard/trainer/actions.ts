@@ -90,24 +90,8 @@ export async function createBatch(rawInput: unknown) {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      // Generate a unique 4-digit code
-      let code = "";
-      let isUnique = false;
-      let retries = 0;
-      while (!isUnique && retries < 100) {
-        code = Math.floor(1000 + Math.random() * 9000).toString();
-        const existing = await tx.batch.findUnique({
-          where: { code },
-        });
-        if (!existing) {
-          isUnique = true;
-        }
-        retries++;
-      }
-
-      if (!isUnique) {
-        throw new Error("Failed to generate unique batch code. Please try again.");
-      }
+      // Generate a unique UUID for the invite token code
+      const code = crypto.randomUUID();
 
       // Create batch under the trainer's institution
       const batch = await tx.batch.create({

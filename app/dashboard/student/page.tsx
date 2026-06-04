@@ -6,13 +6,20 @@ import { Role } from "@/lib/generated/prisma/enums";
 import { requireRole } from "@/lib/auth";
 import { JoinBatchForm } from "./join-batch-form";
 import { StudentSessionItem } from "./student-session-item";
+import { LeaveBatchButton } from "./leave-batch-button";
 
 interface PageProps {
-  searchParams: Promise<{ batchId?: string; join?: string }>;
+  searchParams: Promise<{
+    batchId?: string;
+    join?: string;
+    joined?: string;
+    error?: string;
+    info?: string;
+  }>;
 }
 
 export default async function StudentDashboard({ searchParams }: PageProps) {
-  const { batchId, join } = await searchParams;
+  const { batchId, join, joined, error, info } = await searchParams;
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
@@ -43,6 +50,9 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
     ? (batches.find((b) => b.id === activeBatchId) || batches[0])
     : undefined;
 
+  // Find next batch to fallback to if this batch is left
+  const nextBatch = activeBatch ? batches.find((b) => b.id !== activeBatch.id) : undefined;
+
   // Fetch sessions for active batch
   const sessions = activeBatch
     ? await prisma.session.findMany({
@@ -60,6 +70,36 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-8">
+      {/* Notifications */}
+      {joined && (
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-semibold">
+            Successfully enrolled and joined batch: <strong className="text-zinc-100">{joined}</strong>!
+          </span>
+        </div>
+      )}
+
+      {info && (
+        <div className="p-4 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-semibold">{info}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span className="text-sm font-semibold">{error}</span>
+        </div>
+      )}
+
       {/* Welcome Banner */}
       <div className="p-8 rounded-3xl bg-radial from-teal-950/20 to-zinc-950 border border-teal-500/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -71,9 +111,16 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           </p>
         </div>
         {activeBatch ? (
-          <div className="px-4 py-2 rounded-2xl bg-zinc-900 border border-zinc-800 text-sm">
-            <span className="text-zinc-400">Viewing Batch: </span>
-            <strong className="text-teal-400">{activeBatch.name}</strong>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5">
+            <div className="px-4 py-2 rounded-2xl bg-zinc-900 border border-zinc-800 text-sm">
+              <span className="text-zinc-400">Viewing Batch: </span>
+              <strong className="text-teal-400">{activeBatch.name}</strong>
+            </div>
+            <LeaveBatchButton
+              batchId={activeBatch.id}
+              batchName={activeBatch.name}
+              nextBatchId={nextBatch?.id}
+            />
           </div>
         ) : (
           <div className="px-4 py-2 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">

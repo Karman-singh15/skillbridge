@@ -45,6 +45,7 @@ model Batch {
   sessions      Session[]
   trainers      BatchTrainer[]
   students      BatchStudent[]
+  invites       Invite[]
 }
 
 model BatchTrainer {
@@ -93,4 +94,15 @@ enum AttendanceStatus {
   PRESENT
   ABSENT
   LATE
+}
+
+model Invite {
+  id        String   @id @default(cuid())
+  batchId   String
+  code      String   @unique
+  isOneTime Boolean  @default(false)
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  batch     Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
 }

@@ -36,7 +36,7 @@ export function JoinBatchForm({ showCancel, cancelHref }: JoinBatchFormProps) {
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-extrabold text-zinc-100 tracking-tight">Join Your Batch</h2>
         <p className="text-sm text-zinc-400">
-          Enter the 4-digit numeric code shared by your trainer to onboard to your class.
+          Enter the invite token or click the invite link shared by your trainer to onboard to your class.
         </p>
       </div>
 
@@ -49,26 +49,24 @@ export function JoinBatchForm({ showCancel, cancelHref }: JoinBatchFormProps) {
 
         <div className="space-y-2">
           <label htmlFor="code-input" className="block text-xs font-semibold text-zinc-400 text-center uppercase tracking-wider">
-            4-Digit Batch Code
+            Invite Token
           </label>
           <input
             id="code-input"
             type="text"
             required
-            maxLength={4}
-            placeholder="e.g. 5824"
+            placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
             value={code}
             onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, ""); // Allow only digits
-              if (val.length <= 4) setCode(val);
+              setCode(e.target.value.trim());
             }}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-4 text-center text-3xl font-extrabold font-mono tracking-widest text-teal-400 placeholder-zinc-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-3 text-center text-sm font-bold font-mono text-teal-400 placeholder-zinc-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
           />
         </div>
 
         <button
           type="submit"
-          disabled={code.length !== 4 || loading}
+          disabled={code.length < 4 || loading}
           className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-bold rounded-xl text-sm transition-all shadow-lg hover:shadow-teal-500/10 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
           {loading ? "Joining Batch..." : "Join Batch"}

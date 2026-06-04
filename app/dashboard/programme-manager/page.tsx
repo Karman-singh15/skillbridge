@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/generated/prisma/client";
 import { requireRole } from "@/lib/auth";
+import { InstitutionsList } from "./institutions-list";
 
 export default async function ProgrammeManagerDashboard() {
   const { userId } = await auth();
@@ -66,6 +67,27 @@ export default async function ProgrammeManagerDashboard() {
     let instPresent = 0;
     let instMarked = 0;
 
+    const detailedBatches = instBatches.map((b) => {
+      let batchPresent = 0;
+      let batchMarked = 0;
+      b.sessions.forEach((s) => {
+        s.attendance.forEach((att) => {
+          batchMarked++;
+          if (att.status === "PRESENT") batchPresent++;
+        });
+      });
+      const batchRate = batchMarked > 0 ? Math.round((batchPresent / batchMarked) * 100) : 0;
+
+      return {
+        id: b.id,
+        name: b.name,
+        code: b.code,
+        maxStudents: b.maxStudents,
+        studentCount: b.students.length,
+        attendanceRate: batchRate,
+      };
+    });
+
     instBatches.forEach((b) => {
       instStudents += b.students.length;
       b.sessions.forEach((s) => {
@@ -85,6 +107,7 @@ export default async function ProgrammeManagerDashboard() {
       batchesCount: instBatches.length,
       studentsCount: instStudents,
       attendanceRate: instRate,
+      batches: detailedBatches,
     };
   });
 
@@ -126,30 +149,7 @@ export default async function ProgrammeManagerDashboard() {
         {instAnalytics.length === 0 ? (
           <p className="text-sm text-zinc-500 text-center py-12">No institutions onboarded yet.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider font-bold">
-                  <th className="py-4">Institution Name</th>
-                  <th className="py-4">Batches</th>
-                  <th className="py-4">Students Enrolled</th>
-                  <th className="py-4 text-right">Attendance Rate</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-900 text-sm">
-                {instAnalytics.map((inst) => (
-                  <tr key={inst.id} className="hover:bg-zinc-900/20 transition-all">
-                    <td className="py-4 font-bold text-zinc-200">{inst.name}</td>
-                    <td className="py-4 text-zinc-400">{inst.batchesCount}</td>
-                    <td className="py-4 text-zinc-400">{inst.studentsCount}</td>
-                    <td className="py-4 text-right font-extrabold text-purple-400">
-                      {inst.attendanceRate}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <InstitutionsList institutions={instAnalytics} />
         )}
       </div>
     </div>

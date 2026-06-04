@@ -35,16 +35,25 @@ interface SessionData {
 interface TrainerClientProps {
   initialBatches: BatchData[];
   initialSessions: SessionData[];
+  error?: string;
 }
 
-export function TrainerClient({ initialBatches, initialSessions }: TrainerClientProps) {
+export function TrainerClient({ initialBatches, initialSessions, error }: TrainerClientProps) {
   const [batches, setBatches] = useState<BatchData[]>(initialBatches);
   const [sessions, setSessions] = useState<SessionData[]>(initialSessions);
+  const [copiedBatchId, setCopiedBatchId] = useState<string | null>(null);
 
   // Forms state
   const [batchName, setBatchName] = useState("");
   const [maxStudents, setMaxStudents] = useState("");
   const [batchLoading, setBatchLoading] = useState(false);
+
+  const handleCopyLink = (batchId: string, code: string) => {
+    const link = `${window.location.origin}/invite/${code}`;
+    navigator.clipboard.writeText(link);
+    setCopiedBatchId(batchId);
+    setTimeout(() => setCopiedBatchId(null), 2000);
+  };
 
   const [sessionTitle, setSessionTitle] = useState("");
   const [sessionDate, setSessionDate] = useState("");
@@ -163,7 +172,16 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
 
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="space-y-6 w-full">
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span className="text-sm font-semibold">{error}</span>
+        </div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Column 1: Batch management */}
       <div className="space-y-8 lg:col-span-1">
         {/* Create Batch */}
@@ -223,17 +241,25 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
               {batches.map((batch) => (
                 <div key={batch.id} className="p-4 bg-zinc-950/60 border border-zinc-800/80 rounded-2xl space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-bold text-zinc-100 text-sm">{batch.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono font-bold tracking-wider">
-                          CODE: {batch.code}
-                        </span>
-                        <span className="text-xs text-zinc-500">
-                          {batch.studentCount} / {batch.maxStudents || "∞"} Students
-                        </span>
-                      </div>
+                  <div className="flex flex-col space-y-2">
+                    <h3 className="font-bold text-zinc-100 text-sm">{batch.name}</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1">
+                      <button
+                        onClick={() => handleCopyLink(batch.id, batch.code)}
+                        className="px-3 py-1.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 border border-teal-500/20 text-[11px] font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 self-start"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          {copiedBatchId === batch.id ? (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          ) : (
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                          )}
+                        </svg>
+                        <span>{copiedBatchId === batch.id ? "Copied Link!" : "Copy Invite Link"}</span>
+                      </button>
+                      <span className="text-[11px] text-zinc-500 sm:ml-auto">
+                        {batch.studentCount} / {batch.maxStudents || "∞"} Students
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -535,6 +561,7 @@ export function TrainerClient({ initialBatches, initialSessions }: TrainerClient
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

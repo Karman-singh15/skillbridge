@@ -5,7 +5,12 @@ import { Role } from "@/lib/generated/prisma/enums";
 import { requireRole } from "@/lib/auth";
 import { TrainerClient } from "./trainer-client";
 
-export default async function TrainerDashboard() {
+interface PageProps {
+  searchParams: Promise<{ error?: string }>;
+}
+
+export default async function TrainerDashboard({ searchParams }: PageProps) {
+  const { error } = await searchParams;
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
@@ -109,7 +114,7 @@ export default async function TrainerDashboard() {
         </div>
       </div>
 
-      <TrainerClient initialBatches={batches} initialSessions={mappedSessions} />
+      <TrainerClient initialBatches={batches} initialSessions={mappedSessions} error={error} />
     </div>
   );
 }

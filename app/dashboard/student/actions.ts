@@ -7,7 +7,7 @@ import { requireRole } from "@/lib/auth";
 import { z } from "zod";
 
 const joinBatchSchema = z.object({
-  code: z.string().length(4, "Batch code must be exactly 4 digits").regex(/^\d+$/, "Code must be numeric"),
+  code: z.string().min(4, "Invite token or code must be at least 4 characters"),
 });
 
 export async function joinBatch(rawInput: unknown) {
@@ -22,23 +22,43 @@ export async function joinBatch(rawInput: unknown) {
 
   const validation = joinBatchSchema.safeParse(rawInput);
   if (!validation.success) {
-    return { error: validation.error.flatten().fieldErrors.code?.[0] || "Invalid batch code" };
+    return { error: validation.error.flatten().fieldErrors.code?.[0] || "Invalid invite token" };
   }
 
   const { code } = validation.data;
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      // Find the batch by its unique 4-digit code
-      const batch = await tx.batch.findUnique({
+      // Find matching invite first
+      const invite = await tx.invite.findUnique({
         where: { code },
         include: {
-          students: true,
+          batch: {
+            include: {
+              students: true,
+            },
+          },
         },
       });
 
+      let batch;
+      if (invite) {
+        if (invite.isOneTime && invite.isUsed) {
+          throw new Error("This invite token has already been used.");
+        }
+        batch = invite.batch;
+      } else {
+        // Fallback to searching Batch directly by code
+        batch = await tx.batch.findUnique({
+          where: { code },
+          include: {
+            students: true,
+          },
+        });
+      }
+
       if (!batch) {
-        throw new Error("No batch found with this 4-digit code.");
+        throw new Error("Invalid invite token or batch code.");
       }
 
       // Check if student is already enrolled in this specific batch
@@ -65,6 +85,14 @@ export async function joinBatch(rawInput: unknown) {
           studentId: dbUser.id,
         },
       });
+
+      // Mark invite as used if one-time
+      if (invite && invite.isOneTime) {
+        await tx.invite.update({
+          where: { id: invite.id },
+          data: { isUsed: true },
+        });
+      }
 
       return enrollment;
     });
@@ -149,6 +177,31 @@ export async function markAttendance(sessionId: string) {
     return { success: true, attendance };
   } catch (error: any) {
     return { error: error.message || "Failed to mark attendance." };
+  }
+}
+
+export async function leaveBatch(batchId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const dbUser = await prisma.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+  if (!dbUser) throw new Error("User not found");
+  requireRole(dbUser.role, [Role.STUDENT]);
+
+  try {
+    // Remove user enrollment for this batch
+    await prisma.batchStudent.deleteMany({
+      where: {
+        batchId,
+        studentId: dbUser.id,
+      },
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    return { error: error.message || "Failed to leave the batch." };
   }
 }
 
