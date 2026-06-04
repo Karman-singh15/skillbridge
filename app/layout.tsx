@@ -1,6 +1,8 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
+import { GlobalRouteLoader } from "@/components/global-route-loader";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "SkillBridge",
@@ -15,7 +17,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          <Suspense fallback={null}>
+            <GlobalRouteLoader />
+          </Suspense>
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
