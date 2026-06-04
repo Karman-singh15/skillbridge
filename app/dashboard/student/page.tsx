@@ -68,6 +68,18 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
       })
     : [];
 
+  const mappedSessions = sessions.map((s) => ({
+    id: s.id,
+    title: s.title,
+    date: s.date.toISOString(),
+    startTime: s.startTime,
+    endTime: s.endTime,
+    attendance: s.attendance.map((a) => ({
+      id: a.id,
+      status: a.status,
+    })),
+  }));
+
   return (
     <div className="space-y-8">
       {/* Notifications */}
@@ -214,7 +226,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                {sessions.map((session) => (
+                {mappedSessions.map((session) => (
                   <StudentSessionItem key={session.id} session={session} />
                 ))}
               </div>
