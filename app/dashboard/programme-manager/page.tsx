@@ -98,6 +98,9 @@ export default async function ProgrammeManagerDashboard() {
       });
     });
 
+    const uniqueStudentIds = new Set(instBatches.flatMap((b) => b.students.map((s) => s.studentId)));
+    const uniqueStudentsCount = uniqueStudentIds.size;
+
     const instRate = instMarked > 0 ? Math.round((instPresent / instMarked) * 100) : 0;
 
     return {
@@ -106,6 +109,7 @@ export default async function ProgrammeManagerDashboard() {
       email: inst.email,
       batchesCount: instBatches.length,
       studentsCount: instStudents,
+      uniqueStudentsCount: uniqueStudentsCount,
       attendanceRate: instRate,
       batches: detailedBatches,
     };

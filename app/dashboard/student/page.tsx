@@ -72,19 +72,19 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
     <div className="space-y-8">
       {/* Notifications */}
       {joined && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="p-4 bg-zinc-900 border border-zinc-850 text-zinc-300 rounded-2xl flex items-center gap-3 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span className="text-sm font-semibold">
-            Successfully enrolled and joined batch: <strong className="text-zinc-100">{joined}</strong>!
+            Successfully enrolled and joined batch: <strong className="text-white font-bold">{joined}</strong>!
           </span>
         </div>
       )}
 
       {info && (
-        <div className="p-4 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="p-4 bg-zinc-900 border border-zinc-850 text-zinc-300 rounded-2xl flex items-center gap-3 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span className="text-sm font-semibold">{info}</span>
@@ -92,7 +92,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
       )}
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
+        <div className="p-4 bg-zinc-900 border border-zinc-850 text-red-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -101,9 +101,9 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
       )}
 
       {/* Welcome Banner */}
-      <div className="p-8 rounded-3xl bg-radial from-teal-950/20 to-zinc-950 border border-teal-500/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="p-8 rounded-3xl bg-zinc-900/10 border border-zinc-850 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-50">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white">
             Welcome back, {dbUser.name}!
           </h1>
           <p className="text-zinc-400 text-sm mt-1">
@@ -112,9 +112,9 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
         </div>
         {activeBatch ? (
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5">
-            <div className="px-4 py-2 rounded-2xl bg-zinc-900 border border-zinc-800 text-sm">
+            <div className="px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-900 text-sm">
               <span className="text-zinc-400">Viewing Batch: </span>
-              <strong className="text-teal-400">{activeBatch.name}</strong>
+              <strong className="text-white font-bold">{activeBatch.name}</strong>
             </div>
             <LeaveBatchButton
               batchId={activeBatch.id}
@@ -140,7 +140,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
                 href={`/dashboard/student?batchId=${b.id}`}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
                   isActive
-                    ? "bg-teal-500/15 text-teal-400 border-teal-500/30 font-bold"
+                    ? "bg-white text-black border-white font-bold"
                     : "bg-zinc-900 border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-250"
                 }`}
               >
@@ -150,7 +150,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
           })}
           <Link
             href={`/dashboard/student?batchId=${activeBatchId || ""}&join=true`}
-            className="px-4 py-2 rounded-xl text-sm font-semibold border border-dashed border-zinc-800 bg-zinc-950/20 hover:border-teal-500/50 hover:bg-teal-500/5 hover:text-teal-400 text-zinc-500 flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-4 py-2 rounded-xl text-sm font-semibold border border-dashed border-zinc-800 bg-zinc-950/20 hover:border-zinc-500 hover:bg-zinc-900/40 hover:text-white text-zinc-500 flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -187,13 +187,13 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
             </div>
             <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800 backdrop-blur-xl">
               <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">On Time Count</p>
-              <p className="text-4xl font-extrabold text-emerald-400 mt-2">
+              <p className="text-4xl font-extrabold text-white mt-2">
                 {sessions.filter((s) => s.attendance[0]?.status === "PRESENT").length}
               </p>
             </div>
             <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800 backdrop-blur-xl">
               <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Attendance Rate</p>
-              <p className="text-4xl font-extrabold text-teal-400 mt-2">
+              <p className="text-4xl font-extrabold text-white mt-2">
                 {sessions.length > 0
                   ? `${Math.round(
                       (sessions.filter((s) => s.attendance[0]?.status === "PRESENT").length /

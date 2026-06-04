@@ -199,7 +199,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                 placeholder="e.g. Batch A (Morning)"
                 value={batchName}
                 onChange={(e) => setBatchName(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all"
               />
               {errors.batch?.name && (
                 <p className="text-red-400 text-xs mt-1">{errors.batch.name[0]}</p>
@@ -216,7 +216,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                 min="1"
                 value={maxStudents}
                 onChange={(e) => setMaxStudents(e.target.value)}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all"
               />
               {errors.batch?.maxStudents && (
                 <p className="text-red-400 text-xs mt-1">{errors.batch.maxStudents[0]}</p>
@@ -225,7 +225,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
             <button
               type="submit"
               disabled={batchLoading}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all cursor-pointer"
+              className="w-full py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition-all cursor-pointer"
             >
               {batchLoading ? "Creating..." : "Create Batch"}
             </button>
@@ -246,7 +246,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1">
                       <button
                         onClick={() => handleCopyLink(batch.id, batch.code)}
-                        className="px-3 py-1.5 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 border border-teal-500/20 text-[11px] font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 self-start"
+                        className="px-3 py-1.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-[11px] font-bold tracking-wide transition-all cursor-pointer flex items-center gap-1.5 self-start"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           {copiedBatchId === batch.id ? (
@@ -302,7 +302,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                     placeholder="e.g. Intro to Databases"
                     value={sessionTitle}
                     onChange={(e) => setSessionTitle(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 placeholder-zinc-700 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all"
                   />
                   {errors.session?.title && (
                     <p className="text-red-400 text-xs mt-1">{errors.session.title[0]}</p>
@@ -318,7 +318,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                     required
                     value={sessionBatchId}
                     onChange={(e) => setSessionBatchId(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all"
                   >
                     <option value="">-- Select Batch --</option>
                     {batches.map((b) => (
@@ -342,7 +342,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                     required
                     value={sessionDate}
                     onChange={(e) => setSessionDate(e.target.value)}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all"
                   />
                   {errors.session?.date && (
                     <p className="text-red-400 text-xs mt-1">{errors.session.date[0]}</p>
@@ -361,7 +361,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                         setShowStartPicker(!showStartPicker);
                         setShowEndPicker(false);
                       }}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-left text-zinc-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all flex justify-between items-center cursor-pointer"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-left text-zinc-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all flex justify-between items-center cursor-pointer"
                     >
                       <span>{formatTo12Hour(sessionStart) || "09:00 AM"}</span>
                       <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -395,7 +395,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                         setShowEndPicker(!showEndPicker);
                         setShowStartPicker(false);
                       }}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-left text-zinc-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all flex justify-between items-center cursor-pointer"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-left text-zinc-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm transition-all flex justify-between items-center cursor-pointer"
                     >
                       <span>{formatTo12Hour(sessionEnd) || "10:00 AM"}</span>
                       <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -423,7 +423,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
               <button
                 type="submit"
                 disabled={sessionLoading}
-                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all cursor-pointer"
+                className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition-all cursor-pointer"
               >
                 {sessionLoading ? "Scheduling..." : "Schedule Session"}
               </button>
@@ -442,7 +442,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                 <div
                   key={session.id}
                   onClick={() => setSelectedSessionId(session.id)}
-                  className="p-4 bg-zinc-950/40 border border-zinc-900 hover:border-emerald-500/30 hover:bg-zinc-950/80 rounded-2xl flex justify-between items-center cursor-pointer transition-all"
+                  className="p-4 bg-zinc-950/40 border border-zinc-900 hover:border-orange-500/30 hover:bg-zinc-950/80 rounded-2xl flex justify-between items-center cursor-pointer transition-all"
                 >
                   <div>
                     <h3 className="font-bold text-zinc-200 text-sm">{session.title}</h3>
@@ -472,7 +472,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
               <div>
                 <h3 className="text-xl font-bold text-zinc-100">{selectedSession.title}</h3>
                 <p className="text-xs text-zinc-400 mt-1">
-                  Batch: <strong className="text-emerald-400">{selectedSession.batchName}</strong> • Date: {selectedSession.date} • {formatTo12Hour(selectedSession.startTime)} - {formatTo12Hour(selectedSession.endTime)}
+                  Batch: <strong className="text-orange-400">{selectedSession.batchName}</strong> • Date: {selectedSession.date} • {formatTo12Hour(selectedSession.startTime)} - {formatTo12Hour(selectedSession.endTime)}
                 </p>
               </div>
               <button

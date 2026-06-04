@@ -17,6 +17,7 @@ interface InstitutionAnalytics {
   email: string;
   batchesCount: number;
   studentsCount: number;
+  uniqueStudentsCount: number;
   attendanceRate: number;
   batches: DetailedBatch[];
 }
@@ -39,6 +40,7 @@ export function InstitutionsList({ institutions }: InstitutionsListProps) {
           <tr className="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider font-bold">
             <th className="py-4">Institution Name</th>
             <th className="py-4">Batches</th>
+            <th className="py-4">Total Enrollments</th>
             <th className="py-4">Students Enrolled</th>
             <th className="py-4 text-right">Attendance Rate</th>
           </tr>
@@ -68,13 +70,14 @@ export function InstitutionsList({ institutions }: InstitutionsListProps) {
                   </td>
                   <td className="py-4 text-zinc-400">{inst.batchesCount}</td>
                   <td className="py-4 text-zinc-400">{inst.studentsCount}</td>
+                  <td className="py-4 text-zinc-400">{inst.uniqueStudentsCount}</td>
                   <td className="py-4 text-right font-extrabold text-purple-400">
                     {inst.attendanceRate}%
                   </td>
                 </tr>
                 {isExpanded && (
                   <tr>
-                    <td colSpan={4} className="bg-zinc-950/40 p-4 border-b border-zinc-900/80">
+                    <td colSpan={5} className="bg-zinc-950/40 p-4 border-b border-zinc-900/80">
                       {inst.batches.length === 0 ? (
                         <p className="text-xs text-zinc-500 text-center py-4">
                           No batches created for this institution yet.

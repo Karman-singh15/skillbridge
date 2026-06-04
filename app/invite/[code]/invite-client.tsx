@@ -19,10 +19,10 @@ export function InviteClient({ code }: InviteClientProps) {
   }, [code, router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black p-4">
       <div className="flex flex-col items-center space-y-4 text-center">
         <svg
-          className="animate-spin h-8 w-8 text-teal-400"
+          className="animate-spin h-8 w-8 text-white"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

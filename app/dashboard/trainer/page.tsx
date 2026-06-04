@@ -103,7 +103,7 @@ export default async function TrainerDashboard({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-8">
-      <div className="p-8 rounded-3xl bg-radial from-emerald-950/20 to-zinc-950 border border-emerald-500/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="p-8 rounded-3xl bg-radial from-orange-950/20 to-zinc-950 border border-orange-500/20 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-zinc-50">
             Trainer Workspace

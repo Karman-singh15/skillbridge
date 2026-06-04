@@ -72,7 +72,7 @@ function WheelColumn({ options, selectedValue, onChange }: WheelColumnProps) {
               key={index}
               className={`h-10 flex items-center justify-center snap-center text-sm font-semibold transition-all duration-150 ${
                 isSelected
-                  ? "text-teal-400 text-base font-bold scale-110"
+                  ? "text-orange-400 text-base font-bold scale-110"
                   : "text-zinc-500 scale-90 opacity-40"
               }`}
             >

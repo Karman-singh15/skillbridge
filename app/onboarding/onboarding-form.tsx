@@ -115,7 +115,7 @@ export function OnboardingForm({
             placeholder={role === Role.INSTITUTION ? "e.g. Skill Development Center" : "e.g. Jane Doe"}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-zinc-900/40 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-200 placeholder-zinc-600 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
+            className="w-full bg-zinc-900/40 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-200 placeholder-zinc-600 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 outline-none transition-all"
           />
           {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name[0]}</p>}
         </div>
@@ -131,7 +131,7 @@ export function OnboardingForm({
                 onClick={() => setRole(r.value)}
                 className={`flex flex-col text-left p-4 rounded-2xl border transition-all duration-200 cursor-pointer ${
                   role === r.value
-                    ? "bg-teal-950/20 border-teal-500 shadow-[0_0_15px_-3px_rgba(20,184,166,0.2)]"
+                    ? "bg-zinc-900 border-white shadow-[0_0_15px_-3px_rgba(255,255,255,0.1)]"
                     : "bg-zinc-900/20 border-zinc-800 hover:border-zinc-700"
                 }`}
               >
@@ -154,7 +154,7 @@ export function OnboardingForm({
               required
               value={institutionId}
               onChange={(e) => setInstitutionId(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-200 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 outline-none transition-all"
             >
               <option value="">-- Choose an Institution --</option>
               {institutions.map((inst) => (
@@ -185,7 +185,7 @@ export function OnboardingForm({
               placeholder="e.g. Northern Region, Sector 4"
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-200 placeholder-zinc-600 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-200 placeholder-zinc-600 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 outline-none transition-all"
             />
             {errors.region && <p className="text-red-400 text-xs mt-1">{errors.region[0]}</p>}
           </div>
@@ -195,7 +195,7 @@ export function OnboardingForm({
         <button
           type="submit"
           disabled={!role || loading}
-          className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-bold rounded-xl transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          className="w-full py-4 bg-white hover:bg-zinc-200 text-black font-bold rounded-xl transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
           {loading ? (
             <>

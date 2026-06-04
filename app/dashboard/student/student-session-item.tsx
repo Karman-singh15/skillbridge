@@ -168,13 +168,13 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
         {attendance ? (
           <span
             className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide border flex items-center gap-1.5 ${attendance.status === "PRESENT"
-                ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
                 : attendance.status === "LATE"
-                  ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                  : "bg-red-500/15 text-red-400 border-red-500/30"
+                  ? "bg-amber-500/10 text-amber-400 border-amber-500/25"
+                  : "bg-zinc-950 text-zinc-500 border-zinc-900/50"
               }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${attendance.status === "PRESENT" ? "bg-emerald-400 animate-pulse" : attendance.status === "LATE" ? "bg-amber-400" : "bg-red-400"
+            <span className={`w-1.5 h-1.5 rounded-full ${attendance.status === "PRESENT" ? "bg-emerald-400 animate-pulse" : attendance.status === "LATE" ? "bg-amber-400" : "bg-zinc-800"
               }`} />
             {attendance.status === "PRESENT" ? "ON TIME" : attendance.status}
           </span>
@@ -189,8 +189,8 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
                   : !canMark
                     ? "bg-zinc-900 border border-zinc-800 text-zinc-500 cursor-not-allowed opacity-75"
                     : status === "ACTIVE"
-                      ? "bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white shadow-teal-500/10 hover:shadow-teal-500/20"
-                      : "bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/10 hover:shadow-amber-600/20"
+                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                      : "bg-amber-600 hover:bg-amber-700 text-white shadow-sm"
                 }`}
             >
               {loading ? (

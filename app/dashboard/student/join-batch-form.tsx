@@ -60,14 +60,14 @@ export function JoinBatchForm({ showCancel, cancelHref }: JoinBatchFormProps) {
             onChange={(e) => {
               setCode(e.target.value.trim());
             }}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-3 text-center text-sm font-bold font-mono text-teal-400 placeholder-zinc-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-4 py-3 text-center text-sm font-bold font-mono text-white placeholder-zinc-800 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 outline-none transition-all"
           />
         </div>
 
         <button
           type="submit"
           disabled={code.length < 4 || loading}
-          className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-bold rounded-xl text-sm transition-all shadow-lg hover:shadow-teal-500/10 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-bold rounded-xl text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
           {loading ? "Joining Batch..." : "Join Batch"}
         </button>

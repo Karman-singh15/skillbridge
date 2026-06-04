@@ -46,7 +46,7 @@ export default async function MonitoringOfficerDashboard() {
   const totalInstitutions = institutions.length;
   const totalBatches = batches.length;
   const totalSessions = sessions.length;
-  
+
   let totalPresent = 0;
   let totalMarked = 0;
   sessions.forEach((s) => {
