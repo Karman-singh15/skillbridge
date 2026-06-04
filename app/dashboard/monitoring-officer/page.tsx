@@ -39,7 +39,10 @@ export default async function MonitoringOfficerDashboard() {
       trainer: true,
       attendance: true,
     },
-    orderBy: { date: "desc" },
+    orderBy: [
+      { date: "desc" },
+      { startTime: "desc" },
+    ],
   });
 
   // Calculate totals

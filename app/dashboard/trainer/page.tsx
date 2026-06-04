@@ -70,9 +70,10 @@ export default async function TrainerDashboard({ searchParams }: PageProps) {
       },
       attendance: true,
     },
-    orderBy: {
-      date: "desc",
-    },
+    orderBy: [
+      { date: "desc" },
+      { startTime: "desc" },
+    ],
   });
 
   const mappedSessions = sessions.map((s) => {

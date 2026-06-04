@@ -62,9 +62,10 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
             where: { studentId: dbUser.id },
           },
         },
-        orderBy: {
-          date: "desc",
-        },
+        orderBy: [
+          { date: "desc" },
+          { startTime: "desc" },
+        ],
       })
     : [];
 
