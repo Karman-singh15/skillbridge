@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { leaveBatch } from "./actions";
 import { LoadingOverlay } from "@/components/loading-overlay";
 
@@ -12,7 +11,6 @@ interface LeaveBatchButtonProps {
 }
 
 export function LeaveBatchButton({ batchId, batchName, nextBatchId }: LeaveBatchButtonProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
@@ -23,9 +21,8 @@ export function LeaveBatchButton({ batchId, batchName, nextBatchId }: LeaveBatch
       alert(res.error);
       setLoading(false);
     } else {
-      const redirectPath = nextBatchId ? `/dashboard/student?batchId=${nextBatchId}` : "/dashboard";
-      router.replace(redirectPath);
-      router.refresh();
+      const redirectPath = nextBatchId ? `/dashboard/student?batchId=${nextBatchId}` : "/dashboard/student";
+      window.location.href = redirectPath;
     }
   }
 
