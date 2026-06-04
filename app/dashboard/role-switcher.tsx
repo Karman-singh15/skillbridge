@@ -4,6 +4,7 @@ import { useState } from "react";
 import { switchRole } from "./actions";
 import { useRouter } from "next/navigation";
 import { Role } from "@/lib/generated/prisma/enums";
+import { LoadingOverlay } from "@/components/loading-overlay";
 
 interface RoleSwitcherProps {
   currentRole: Role;
@@ -38,7 +39,9 @@ export function RoleSwitcher({ currentRole }: RoleSwitcherProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-zinc-900/60 border border-zinc-800/80 rounded-2xl px-3 py-1.5 backdrop-blur-md shadow-inner transition-all">
+    <>
+      <LoadingOverlay visible={loading} />
+      <div className="flex items-center gap-2 bg-zinc-900/60 border border-zinc-800/80 rounded-2xl px-3 py-1.5 backdrop-blur-md shadow-inner transition-all">
       <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5 select-none">
         <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
         Tester:
@@ -56,5 +59,6 @@ export function RoleSwitcher({ currentRole }: RoleSwitcherProps) {
         ))}
       </select>
     </div>
+    </>
   );
 }

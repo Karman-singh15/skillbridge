@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { markAttendance } from "./actions";
+import { LoadingOverlay } from "@/components/loading-overlay";
 
 interface StudentSessionItemProps {
   session: {
@@ -141,6 +142,7 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
 
   return (
     <div className="p-5 rounded-2xl bg-zinc-950/50 border border-zinc-900 hover:border-zinc-800 transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <LoadingOverlay visible={loading} />
       <div className="space-y-1">
         <h3 className="font-bold text-zinc-100 text-base">{session.title}</h3>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">

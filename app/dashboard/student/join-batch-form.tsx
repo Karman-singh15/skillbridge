@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter as useAppRouter } from "next/navigation";
 import { joinBatch } from "./actions";
+import { LoadingOverlay } from "@/components/loading-overlay";
 
 interface JoinBatchFormProps {
   showCancel?: boolean;
@@ -33,6 +34,7 @@ export function JoinBatchForm({ showCancel, cancelHref }: JoinBatchFormProps) {
 
   return (
     <div className="max-w-md mx-auto p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800 backdrop-blur-xl space-y-6 shadow-xl">
+      <LoadingOverlay visible={loading} />
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-extrabold text-zinc-100 tracking-tight">Join Your Batch</h2>
         <p className="text-sm text-zinc-400">

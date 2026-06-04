@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Role } from "@/lib/generated/prisma/enums";
 import { submitOnboarding } from "./actions";
+import { LoadingOverlay } from "@/components/loading-overlay";
 
 interface InstitutionSelectOption {
   id: string;
@@ -83,6 +84,7 @@ export function OnboardingForm({
 
   return (
     <div className="bg-zinc-950/40 border border-zinc-800/80 backdrop-blur-2xl p-8 rounded-3xl shadow-2xl transition-all duration-300">
+      <LoadingOverlay visible={loading} />
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-zinc-50 tracking-tight">
           Complete Your Profile

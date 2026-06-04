@@ -5,6 +5,9 @@ import { createBatch, createSession } from "./actions";
 import { TimePickerScroll } from "./time-picker-scroll";
 
 
+import { LoadingOverlay } from "@/components/loading-overlay";
+
+
 interface BatchData {
   id: string;
   name: string;
@@ -173,6 +176,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
 
   return (
     <div className="space-y-6 w-full">
+      <LoadingOverlay visible={batchLoading || sessionLoading} />
       {error && (
         <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center gap-3 animate-fadeIn">
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
