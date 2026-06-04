@@ -11,23 +11,23 @@ const joinBatchSchema = z.object({
 });
 
 export async function joinBatch(rawInput: unknown) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!dbUser) throw new Error("User not found");
-  requireRole(dbUser.role, [Role.STUDENT]);
-
-  const validation = joinBatchSchema.safeParse(rawInput);
-  if (!validation.success) {
-    return { error: validation.error.flatten().fieldErrors.code?.[0] || "Invalid invite token" };
-  }
-
-  const { code } = validation.data;
-
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!dbUser) throw new Error("User not found");
+    requireRole(dbUser.role, [Role.STUDENT]);
+
+    const validation = joinBatchSchema.safeParse(rawInput);
+    if (!validation.success) {
+      return { error: validation.error.flatten().fieldErrors.code?.[0] || "Invalid invite token" };
+    }
+
+    const { code } = validation.data;
+
     const result = await prisma.$transaction(async (tx) => {
       // Find matching invite first
       const invite = await tx.invite.findUnique({
@@ -103,69 +103,84 @@ export async function joinBatch(rawInput: unknown) {
   }
 }
 
-export async function markAttendance(sessionId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!dbUser) throw new Error("User not found");
-  requireRole(dbUser.role, [Role.STUDENT]);
-
-  // Fetch session details
-  const session = await prisma.session.findUnique({
-    where: { id: sessionId },
-  });
-  if (!session) {
-    throw new Error("Session not found");
-  }
-
-  // Verify student is enrolled in the batch for this session
-  const enrollment = await prisma.batchStudent.findFirst({
-    where: {
-      studentId: dbUser.id,
-      batchId: session.batchId,
-    },
-  });
-  if (!enrollment) {
-    throw new Error("You are not enrolled in the batch for this session.");
-  }
-
-  // Verify attendance not already marked
-  const existingAttendance = await prisma.attendance.findFirst({
-    where: {
-      sessionId,
-      studentId: dbUser.id,
-    },
-  });
-  if (existingAttendance) {
-    throw new Error("Attendance already marked for this session.");
-  }
-
-  // Calculate session start & end time
-  const year = session.date.getUTCFullYear();
-  const month = session.date.getUTCMonth();
-  const date = session.date.getUTCDate();
-
-  const [startH, startM] = session.startTime.split(":").map(Number);
-  const [endH, endM] = session.endTime.split(":").map(Number);
-
-  const start = new Date(year, month, date, startH, startM, 0, 0);
-  const end = new Date(year, month, date, endH, endM, 0, 0);
-  const now = new Date();
-
-  // Evaluate current time against window
-  if (now < start) {
-    throw new Error("Session has not started yet. You cannot mark attendance before the start time.");
-  }
-
-  let status: AttendanceStatus = AttendanceStatus.PRESENT;
-  if (now > end) {
-    status = AttendanceStatus.LATE;
-  }
-
+export async function markAttendance(sessionId: string, clientOffset?: number) {
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!dbUser) throw new Error("User not found");
+    requireRole(dbUser.role, [Role.STUDENT]);
+
+    // Fetch session details
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId },
+    });
+    if (!session) {
+      throw new Error("Session not found");
+    }
+
+    // Verify student is enrolled in the batch for this session
+    const enrollment = await prisma.batchStudent.findFirst({
+      where: {
+        studentId: dbUser.id,
+        batchId: session.batchId,
+      },
+    });
+    if (!enrollment) {
+      throw new Error("You are not enrolled in the batch for this session.");
+    }
+
+    // Verify attendance not already marked
+    const existingAttendance = await prisma.attendance.findFirst({
+      where: {
+        sessionId,
+        studentId: dbUser.id,
+      },
+    });
+    if (existingAttendance) {
+      throw new Error("Attendance already marked for this session.");
+    }
+
+    // Calculate session start & end time
+    const sessionDate = new Date(session.date);
+    const year = sessionDate.getUTCFullYear();
+    const month = sessionDate.getUTCMonth();
+    const date = sessionDate.getUTCDate();
+
+    const [startH, startM] = session.startTime.split(":").map(Number);
+    const [endH, endM] = session.endTime.split(":").map(Number);
+
+    let start: Date;
+    let end: Date;
+
+    if (typeof clientOffset === "number") {
+      // Calculate UTC timestamps representing the session start and end times in the client's timezone.
+      // Date.UTC returns epoch time in UTC. Adding clientOffset (in minutes) converted to ms aligns it to the client's local time.
+      const startUtcMs = Date.UTC(year, month, date, startH, startM, 0, 0);
+      const endUtcMs = Date.UTC(year, month, date, endH, endM, 0, 0);
+      start = new Date(startUtcMs + clientOffset * 60 * 1000);
+      end = new Date(endUtcMs + clientOffset * 60 * 1000);
+    } else {
+      // Fallback to local server timezone if offset not provided
+      start = new Date(year, month, date, startH, startM, 0, 0);
+      end = new Date(year, month, date, endH, endM, 0, 0);
+    }
+
+    const now = new Date();
+
+    // Evaluate current time against window
+    if (now < start) {
+      throw new Error("Session has not started yet. You cannot mark attendance before the start time.");
+    }
+
+    let status: AttendanceStatus = AttendanceStatus.PRESENT;
+    if (now > end) {
+      status = AttendanceStatus.LATE;
+    }
+
     const attendance = await prisma.attendance.create({
       data: {
         sessionId,
@@ -181,16 +196,16 @@ export async function markAttendance(sessionId: string) {
 }
 
 export async function leaveBatch(batchId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!dbUser) throw new Error("User not found");
-  requireRole(dbUser.role, [Role.STUDENT]);
-
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!dbUser) throw new Error("User not found");
+    requireRole(dbUser.role, [Role.STUDENT]);
+
     // Remove user enrollment for this batch
     await prisma.batchStudent.deleteMany({
       where: {

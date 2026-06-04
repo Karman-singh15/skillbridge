@@ -28,10 +28,15 @@ export function RoleSwitcher({ currentRole }: RoleSwitcherProps) {
 
     setLoading(true);
     try {
-      await switchRole(val);
-      // Force refresh and route navigation to correctly load dashboard page
-      router.push("/dashboard");
-      router.refresh();
+      const res = await switchRole(val);
+      if (res?.error) {
+        alert(res.error);
+        setLoading(false);
+      } else {
+        // Force refresh and route navigation to correctly load dashboard page
+        router.push("/dashboard");
+        router.refresh();
+      }
     } catch (err: any) {
       alert(err.message || "Failed to switch role");
       setLoading(false);

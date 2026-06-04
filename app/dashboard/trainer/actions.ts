@@ -22,35 +22,35 @@ const batchSchema = z.object({
 
 // Create a Session
 export async function createSession(rawInput: unknown) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!dbUser) throw new Error("User not found");
-  requireRole(dbUser.role, [Role.TRAINER]);
-
-  const validation = sessionSchema.safeParse(rawInput);
-  if (!validation.success) {
-    return { error: validation.error.flatten().fieldErrors };
-  }
-
-  const input = validation.data;
-
-  // Verify trainer is assigned to this batch
-  const isAssigned = await prisma.batchTrainer.findFirst({
-    where: {
-      batchId: input.batchId,
-      trainerId: dbUser.id,
-    },
-  });
-
-  if (!isAssigned) {
-    return { error: { global: ["You are not authorized to create sessions for this batch."] } };
-  }
-
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!dbUser) throw new Error("User not found");
+    requireRole(dbUser.role, [Role.TRAINER]);
+
+    const validation = sessionSchema.safeParse(rawInput);
+    if (!validation.success) {
+      return { error: validation.error.flatten().fieldErrors };
+    }
+
+    const input = validation.data;
+
+    // Verify trainer is assigned to this batch
+    const isAssigned = await prisma.batchTrainer.findFirst({
+      where: {
+        batchId: input.batchId,
+        trainerId: dbUser.id,
+      },
+    });
+
+    if (!isAssigned) {
+      return { error: { global: ["You are not authorized to create sessions for this batch."] } };
+    }
+
     const session = await prisma.session.create({
       data: {
         batchId: input.batchId,
@@ -70,25 +70,25 @@ export async function createSession(rawInput: unknown) {
 
 // Create a Batch and automatically link it to the trainer
 export async function createBatch(rawInput: unknown) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-  if (!dbUser || !dbUser.institutionId) {
-    return { error: { global: ["Trainer must belong to an institution to create batches."] } };
-  }
-  requireRole(dbUser.role, [Role.TRAINER]);
-
-  const validation = batchSchema.safeParse(rawInput);
-  if (!validation.success) {
-    return { error: validation.error.flatten().fieldErrors };
-  }
-
-  const { name, maxStudents } = validation.data;
-
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (!dbUser || !dbUser.institutionId) {
+      return { error: { global: ["Trainer must belong to an institution to create batches."] } };
+    }
+    requireRole(dbUser.role, [Role.TRAINER]);
+
+    const validation = batchSchema.safeParse(rawInput);
+    if (!validation.success) {
+      return { error: validation.error.flatten().fieldErrors };
+    }
+
+    const { name, maxStudents } = validation.data;
+
     const result = await prisma.$transaction(async (tx) => {
       // Generate a unique UUID for the invite token code
       const code = crypto.randomUUID();
@@ -119,3 +119,4 @@ export async function createBatch(rawInput: unknown) {
     return { error: { global: [error.message || "Failed to create batch."] } };
   }
 }
+

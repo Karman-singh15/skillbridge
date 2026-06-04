@@ -31,29 +31,29 @@ const onboardingSchema = z.discriminatedUnion("role", [
 ]);
 
 export async function submitOnboarding(rawInput: unknown) {
-  const { userId } = await auth();
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
-
-  const clerkUser = await currentUser();
-  if (!clerkUser) {
-    throw new Error("User not found in Clerk");
-  }
-
-  const email = clerkUser.emailAddresses[0]?.emailAddress;
-  if (!email) {
-    throw new Error("User email not found in Clerk");
-  }
-
-  const validation = onboardingSchema.safeParse(rawInput);
-  if (!validation.success) {
-    return { error: validation.error.flatten().fieldErrors };
-  }
-
-  const input = validation.data;
-
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
+      throw new Error("User not found in Clerk");
+    }
+
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    if (!email) {
+      throw new Error("User email not found in Clerk");
+    }
+
+    const validation = onboardingSchema.safeParse(rawInput);
+    if (!validation.success) {
+      return { error: validation.error.flatten().fieldErrors };
+    }
+
+    const input = validation.data;
+
     // Start transaction to create/update user
     await prisma.$transaction(async (tx) => {
       let institutionId: string | null = null;

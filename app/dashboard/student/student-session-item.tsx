@@ -119,7 +119,8 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
     setErrorMsg(null);
 
     try {
-      const res = await markAttendance(session.id);
+      const offset = new Date().getTimezoneOffset();
+      const res = await markAttendance(session.id, offset);
       if (res?.error) {
         setErrorMsg(res.error);
       } else {
