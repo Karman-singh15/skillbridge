@@ -1,5 +1,11 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata } from "next";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "SkillBridge",
+  description: "Attendance management platform",
+};
 
 export default function RootLayout({
   children,
