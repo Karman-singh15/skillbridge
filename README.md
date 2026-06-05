@@ -133,3 +133,7 @@ The database schema is defined in [schema.prisma](prisma/schema.prisma) and uses
 
 ## ⏳ What I'd Do Differently With More Time
 With more time, I would implement **real-time WebSockets/SSE (Server-Sent Events)** for the Monitoring Officer's Live Session Log. Currently, live sessions require a page refresh or polling to load new check-ins. Real-time connections would allow attendance rates to update live in front of the Monitoring Officer as students mark themselves present in classrooms. Also a reminder system which can be automatically be set off when a session is starting or a trainer can manually send reminders to students for marking their attendance.
+
+
+## Personal Notes
+This is a complete end to end attendance monitoring system which i built in a span of 72hrs. It is fully functional but the clerk is in development state and not in a production instance. I tried to resolve that issue but couldnt in the given time frame. Except that it is completely production ready.
