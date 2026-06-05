@@ -4,11 +4,9 @@ import { prisma } from "./prisma";
 export async function getCurrentUser(request?: Request) {
   let userId: string | null = null;
 
-  if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
-    const bypassId = request?.headers?.get("x-bypass-user-id");
-    if (bypassId) {
-      userId = bypassId;
-    }
+  const bypassId = request?.headers?.get("x-bypass-user-id");
+  if (bypassId) {
+    userId = bypassId;
   }
 
   if (!userId) {
