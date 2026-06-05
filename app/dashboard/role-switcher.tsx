@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { switchRole } from "./actions";
-import { useRouter } from "next/navigation";
 import { Role } from "@/lib/generated/prisma/enums";
 import { LoadingOverlay } from "@/components/loading-overlay";
 
@@ -11,7 +10,6 @@ interface RoleSwitcherProps {
 }
 
 export function RoleSwitcher({ currentRole }: RoleSwitcherProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const roles = [
@@ -33,9 +31,8 @@ export function RoleSwitcher({ currentRole }: RoleSwitcherProps) {
         alert(res.error);
         setLoading(false);
       } else {
-        // Force refresh and route navigation to correctly load dashboard page
-        router.push("/dashboard");
-        router.refresh();
+        // Force a hard full-page reload to correctly reload the dashboard under the new role and reset state
+        window.location.href = "/dashboard";
       }
     } catch (err: any) {
       alert(err.message || "Failed to switch role");

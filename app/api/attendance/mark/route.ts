@@ -85,6 +85,12 @@ export async function POST(request: Request) {
 
   let status: AttendanceStatus = AttendanceStatus.PRESENT;
   if (now > end) {
+    if (session.isStrict) {
+      return Response.json(
+        { error: "This is a strict session. You cannot mark attendance after the deadline." },
+        { status: 400 }
+      );
+    }
     status = AttendanceStatus.LATE;
   }
 

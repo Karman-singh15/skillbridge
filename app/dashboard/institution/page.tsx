@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/generated/prisma/client";
 import { requireRole } from "@/lib/auth";
+import { BatchesList } from "./batches-list";
 
 export default async function InstitutionDashboard() {
   const { userId } = await auth();
@@ -26,7 +27,6 @@ export default async function InstitutionDashboard() {
     },
   });
 
-  // Query batches under this institution
   const batches = await prisma.batch.findMany({
     where: {
       institutionId: dbUser.id,
@@ -43,6 +43,38 @@ export default async function InstitutionDashboard() {
       name: "asc",
     },
   });
+
+  const serializedBatches = batches.map((batch) => ({
+    id: batch.id,
+    name: batch.name,
+    code: batch.code,
+    maxStudents: batch.maxStudents,
+    institutionId: batch.institutionId,
+    createdAt: batch.createdAt.toISOString(),
+    students: batch.students.map((std) => ({
+      id: std.id,
+      batchId: std.batchId,
+      studentId: std.studentId,
+    })),
+    sessions: batch.sessions.map((s) => ({
+      id: s.id,
+      batchId: s.batchId,
+      trainerId: s.trainerId,
+      title: s.title,
+      date: s.date.toISOString(),
+      startTime: s.startTime,
+      endTime: s.endTime,
+      isStrict: s.isStrict,
+      createdAt: s.createdAt.toISOString(),
+      attendance: s.attendance.map((att) => ({
+        id: att.id,
+        sessionId: att.sessionId,
+        studentId: att.studentId,
+        status: att.status,
+        markedAt: att.markedAt.toISOString(),
+      })),
+    })),
+  }));
 
   // Compute analytics
   let totalStudents = 0;
@@ -102,46 +134,12 @@ export default async function InstitutionDashboard() {
 
       {/* Batches & Trainers sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Batches list */}
         <div className="lg:col-span-2 p-6 rounded-3xl bg-zinc-900/40 border border-zinc-800 backdrop-blur-xl space-y-6">
           <h2 className="text-xl font-bold text-zinc-100">Batches</h2>
-          {batches.length === 0 ? (
+          {serializedBatches.length === 0 ? (
             <p className="text-sm text-zinc-500 text-center py-12">No batches registered.</p>
           ) : (
-            <div className="space-y-4">
-              {batches.map((batch) => {
-                let batchPresent = 0;
-                let batchMarked = 0;
-                batch.sessions.forEach((s) => {
-                  s.attendance.forEach((att) => {
-                    batchMarked++;
-                    if (att.status === "PRESENT") batchPresent++;
-                  });
-                });
-                const batchRate = batchMarked > 0 ? Math.round((batchPresent / batchMarked) * 100) : 0;
-
-                return (
-                  <div
-                    key={batch.id}
-                    className="p-5 bg-zinc-950/40 border border-zinc-900 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                  >
-                    <div>
-                      <h3 className="font-bold text-zinc-200 text-base">{batch.name}</h3>
-                      <div className="flex gap-4 text-xs text-zinc-500 mt-1">
-                        <span>{batch.students.length} Students</span>
-                        <span>{batch.sessions.length} Sessions</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-xs text-zinc-500">Attendance Rate</p>
-                        <p className="text-sm font-bold text-blue-400">{batchRate}%</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <BatchesList batches={serializedBatches} />
           )}
         </div>
 

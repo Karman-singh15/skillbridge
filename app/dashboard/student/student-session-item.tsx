@@ -12,6 +12,7 @@ interface StudentSessionItemProps {
     date: Date | string;
     startTime: string;
     endTime: string;
+    isStrict?: boolean;
     attendance: {
       id: string;
       status: string; // "PRESENT" | "ABSENT" | "LATE"
@@ -107,6 +108,9 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
     } else if (now >= startTime && now <= endTime) {
       return { status: "ACTIVE" as const, buttonText: "Self-Mark On Time", canMark: true };
     } else {
+      if (session.isStrict) {
+        return { status: "MISSED" as const, buttonText: "Missed", canMark: false };
+      }
       return { status: "ENDED" as const, buttonText: "Mark Late", canMark: true };
     }
   };
@@ -145,7 +149,15 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
     <div className="p-5 rounded-2xl bg-zinc-950/50 border border-zinc-900 hover:border-zinc-800 transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <LoadingOverlay visible={loading} />
       <div className="space-y-1">
-        <h3 className="font-bold text-zinc-100 text-base">{session.title}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="font-bold text-zinc-100 text-base">{session.title}</h3>
+          {session.isStrict && (
+            <span className="text-[10px] bg-red-500/10 border border-red-500/25 text-red-450 px-2 py-0.5 rounded font-black uppercase tracking-wider select-none inline-flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+              Strict
+            </span>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
           <span className="flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,7 +202,9 @@ export function StudentSessionItem({ session }: StudentSessionItemProps) {
               className={`px-4 py-2 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer select-none ${loading
                   ? "bg-zinc-800 text-zinc-500 cursor-wait"
                   : !canMark
-                    ? "bg-zinc-900 border border-zinc-800 text-zinc-500 cursor-not-allowed opacity-75"
+                    ? status === "MISSED"
+                      ? "bg-red-500/15 border border-red-500/30 text-red-400 cursor-not-allowed shadow-none font-black uppercase tracking-wider px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1"
+                      : "bg-zinc-900 border border-zinc-800 text-zinc-500 cursor-not-allowed opacity-75"
                     : status === "ACTIVE"
                       ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                       : "bg-amber-600 hover:bg-amber-700 text-white shadow-sm"

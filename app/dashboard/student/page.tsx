@@ -75,6 +75,7 @@ export default async function StudentDashboard({ searchParams }: PageProps) {
     date: s.date.toISOString(),
     startTime: s.startTime,
     endTime: s.endTime,
+    isStrict: s.isStrict,
     attendance: s.attendance.map((a) => ({
       id: a.id,
       status: a.status,

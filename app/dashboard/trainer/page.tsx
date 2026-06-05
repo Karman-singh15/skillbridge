@@ -71,8 +71,7 @@ export default async function TrainerDashboard({ searchParams }: PageProps) {
       attendance: true,
     },
     orderBy: [
-      { date: "desc" },
-      { startTime: "desc" },
+      { title: "asc" },
     ],
   });
 
@@ -99,6 +98,7 @@ export default async function TrainerDashboard({ searchParams }: PageProps) {
       batchName: s.batch.name,
       attendanceCount: s.attendance.length,
       students: studentList,
+      isStrict: s.isStrict,
     };
   });
 

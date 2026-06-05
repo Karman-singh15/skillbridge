@@ -13,6 +13,16 @@ const sessionSchema = z.object({
   startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid start time"),
   endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid end time"),
   batchId: z.string().min(1, "Please select a batch"),
+  isStrict: z.boolean().optional(),
+}).refine((data) => {
+  const [startH, startM] = data.startTime.split(":").map(Number);
+  const [endH, endM] = data.endTime.split(":").map(Number);
+  const startMinutes = startH * 60 + startM;
+  const endMinutes = endH * 60 + endM;
+  return startMinutes < endMinutes;
+}, {
+  message: "Start time must be before end time",
+  path: ["startTime"],
 });
 
 const batchSchema = z.object({
@@ -59,6 +69,7 @@ export async function createSession(rawInput: unknown) {
         date: input.date,
         startTime: input.startTime,
         endTime: input.endTime,
+        isStrict: !!input.isStrict,
       },
     });
 

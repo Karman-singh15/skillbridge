@@ -178,6 +178,9 @@ export async function markAttendance(sessionId: string, clientOffset?: number) {
 
     let status: AttendanceStatus = AttendanceStatus.PRESENT;
     if (now > end) {
+      if (session.isStrict) {
+        throw new Error("This is a strict session. You cannot mark attendance after the deadline.");
+      }
       status = AttendanceStatus.LATE;
     }
 

@@ -40,8 +40,7 @@ export default async function MonitoringOfficerDashboard() {
       attendance: true,
     },
     orderBy: [
-      { date: "desc" },
-      { startTime: "desc" },
+      { title: "asc" },
     ],
   });
 
@@ -123,7 +122,16 @@ export default async function MonitoringOfficerDashboard() {
 
                   return (
                     <tr key={session.id} className="hover:bg-zinc-900/20 transition-all">
-                      <td className="py-4 font-bold text-zinc-200">{session.title}</td>
+                      <td className="py-4 font-bold text-zinc-200">
+                        <span className="flex items-center gap-1.5">
+                          {session.title}
+                          {session.isStrict && (
+                            <span className="text-[8px] bg-red-500/10 border border-red-500/20 text-red-400 px-1 py-0.2 rounded font-extrabold uppercase tracking-wide select-none">
+                              Strict
+                            </span>
+                          )}
+                        </span>
+                      </td>
                       <td className="py-4 text-zinc-400">{session.batch.name}</td>
                       <td className="py-4 text-zinc-400">{session.trainer.name}</td>
                       <td className="py-4 text-zinc-400">

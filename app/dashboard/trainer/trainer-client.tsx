@@ -33,6 +33,7 @@ interface SessionData {
   batchName: string;
   attendanceCount: number;
   students: StudentAttendance[];
+  isStrict: boolean;
 }
 
 interface TrainerClientProps {
@@ -63,6 +64,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
   const [sessionStart, setSessionStart] = useState("09:00");
   const [sessionEnd, setSessionEnd] = useState("10:00");
   const [sessionBatchId, setSessionBatchId] = useState("");
+  const [isStrict, setIsStrict] = useState(false);
   const [sessionLoading, setSessionLoading] = useState(false);
 
   const [showStartPicker, setShowStartPicker] = useState(false);
@@ -141,6 +143,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
       startTime: sessionStart,
       endTime: sessionEnd,
       batchId: sessionBatchId,
+      isStrict,
     };
 
     const res = await createSession(payload);
@@ -159,6 +162,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
         batchName: selectedBatchName,
         attendanceCount: 0,
         students: [],
+        isStrict: res.session.isStrict,
       };
       setSessions([newSession, ...sessions]);
       // Clear session form
@@ -167,6 +171,7 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
       setSessionStart("09:00");
       setSessionEnd("10:00");
       setSessionBatchId("");
+      setIsStrict(false);
     }
   }
 
@@ -417,10 +422,21 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                         />
                       </div>
                     )}
-                    {errors.session?.endTime && (
-                      <p className="text-red-400 text-xs mt-1">{errors.session.endTime[0]}</p>
-                    )}
                   </div>
+                </div>
+
+                {/* Strict Checkbox */}
+                <div className="flex items-center gap-2.5 bg-zinc-950/40 border border-zinc-900 px-4 py-3 rounded-2xl">
+                  <input
+                    id="strict-session-checkbox"
+                    type="checkbox"
+                    checked={isStrict}
+                    onChange={(e) => setIsStrict(e.target.checked)}
+                    className="w-4 h-4 rounded border-zinc-800 text-orange-600 focus:ring-orange-600 bg-zinc-950 cursor-pointer"
+                  />
+                  <label htmlFor="strict-session-checkbox" className="text-xs text-zinc-300 font-semibold cursor-pointer select-none">
+                    Strict Mode (Enforce deadline, prevent late self-marking)
+                  </label>
                 </div>
               </div>
 
@@ -449,7 +465,14 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
                   className="p-4 bg-zinc-950/40 border border-zinc-900 hover:border-orange-500/30 hover:bg-zinc-950/80 rounded-2xl flex justify-between items-center cursor-pointer transition-all"
                 >
                   <div>
-                    <h3 className="font-bold text-zinc-200 text-sm">{session.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-zinc-200 text-sm">{session.title}</h3>
+                      {session.isStrict && (
+                        <span className="text-[8px] bg-red-500/10 border border-red-500/25 text-red-400 px-1.5 py-0.2 rounded font-black uppercase tracking-wider select-none">
+                          Strict
+                        </span>
+                      )}
+                    </div>
                     <div className="flex gap-4 text-xs text-zinc-500 mt-1">
                       <span>Batch: <strong className="text-zinc-400">{session.batchName}</strong></span>
                       <span>Date: {session.date}</span>
@@ -474,7 +497,14 @@ export function TrainerClient({ initialBatches, initialSessions, error }: Traine
             {/* Header */}
             <div className="flex justify-between items-start border-b border-zinc-900 pb-4">
               <div>
-                <h3 className="text-xl font-bold text-zinc-100">{selectedSession.title}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-zinc-100">{selectedSession.title}</h3>
+                  {selectedSession.isStrict && (
+                    <span className="text-[10px] bg-red-500/10 border border-red-500/25 text-red-400 px-2 py-0.5 rounded font-black uppercase tracking-wider select-none">
+                      Strict
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-zinc-400 mt-1">
                   Batch: <strong className="text-orange-400">{selectedSession.batchName}</strong> • Date: {selectedSession.date} • {formatTo12Hour(selectedSession.startTime)} - {formatTo12Hour(selectedSession.endTime)}
                 </p>
