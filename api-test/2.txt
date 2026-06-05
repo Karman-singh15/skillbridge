@@ -1,0 +1,11 @@
+fetch("/api/batches/cmq0jn170000004jrf3veq77b/invite", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    isOneTime: false,
+  }),
+})
+  .then(res => res.json())
+  .then(console.log);

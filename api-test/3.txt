@@ -1,0 +1,16 @@
+fetch("/api/sessions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    batchId: "cmq0jn170000004jrf3veq77b",
+    title: "Test session",
+    date: new Date().toLocaleDateString('en-CA'),
+    startTime: "00:00",
+    endTime: "11:00",
+    isStrict: false
+  }),
+})
+  .then(res => res.json())
+  .then(console.log);

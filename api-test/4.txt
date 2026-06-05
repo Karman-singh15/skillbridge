@@ -1,0 +1,13 @@
+fetch("/api/attendance/mark", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    sessionId: "cmq0k9z41000404jrozik898m",
+    status: "PRESENT",
+    clientOffset: new Date().getTimezoneOffset(),
+  }),
+})
+  .then(res => res.json())
+  .then(console.log);

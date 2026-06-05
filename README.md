@@ -36,17 +36,24 @@ All test users are registered with the standard mock password in the development
 |---|---|---|---|---|
 | **POST** | `/api/batches` | Trainer, Institution | [JSON](api-test/1.txt) | Reload the website and the batch will be under Your Batches |
 
-| **POST** | `/api/batches/[id]/invite` | Trainer | fetch("/api/batches/cmq09ndvt0004kyv9oq7ush9p/invite", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    isOneTime: false,
-  }),
-})
-  .then(res => res.json())
-  .then(console.log);
+| **POST** | `/api/batches/[id]/invite` | Trainer | [JSON](api-test/2.txt) | A Response with the link will appear in the console |
+
+| **POST** | `/api/batches/[id]/join` | Student | Change the role to Student and paste the Link generated in previous request in the browser | The batch will be in Visible in Batches Section |
+
+| **POST** | `/api/batches/sessions` | Trainer | [JSON](api-test/3.txt) | Refresh the page and the session will be under Scheduled Sessions |
+
+| **POST** | `/api/attendance/mark` | Student | [JSON](api-test/4.txt) | The Session "This will be marked present" should be marked as PRESENT in attendance records |
+
+| **GET** | `/sessions/:id/attendance` | Trainer | [https://skillbridge-attendance-manager.vercel.app/api/sessions/cmq0k9z41000404jrozik898m/attendance](Click Here) | Views full attendance for a
+session |
+
+| **GET** | `/batches/:id/summary` | Institution | [https://skillbridge-attendance-manager.vercel.app/api/batches/cmq09ndvt0004kyv9oq7ush9p/summary](Click Here) | Views full attendance for a
+batch |
+
+| **GET** | `/institutions/:id/summary ` | Programme Manager | [https://skillbridge-attendance-manager.vercel.app/api/institutions/cmpzz9mxd0006cmv9jklrhqf6/summary](Click Here) | summary across all batches in an institution|
+
+| **GET** | `/programme/summary` | Programme Manager / Monitoring Officer | [https://skillbridge-attendance-manager.vercel.app/api/programme/summary](Click Here) | programme-wide
+summary |
 
 ---
 
@@ -66,15 +73,12 @@ npm install
 ```
 
 ### 3. Environment Variables
+
+**These Keys will be discarded after the interview**
+
 Create a `.env` file in the root directory and configure the variables:
-```env
-DATABASE_URL="postgresql://neondb_owner:npg_15TrlQbKJyCk@ep-winter-glade-aoajpcmo.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
 
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_bGl2ZS1mZWxpbmUtOTQuY2xlcmsuYWNjb3VudHMuZGV2JA
-CLERK_SECRET_KEY=sk_test_DYQKbaAlDEhPzORh3Truy2d1Vn1eNuK8lbQW1yYQ47
-
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
+**The env file is in the google drive**
 
 ### 4. Database Setup
 Ensure your local client is generated and in sync with the database:
@@ -112,7 +116,7 @@ The database schema is defined in [schema.prisma](prisma/schema.prisma) and uses
 * **Database**: **Serverless PostgreSQL (Neon)** — AWS-hosted Postgres SQL cluster providing high availability, scaling, and branching.
 * **ORM**: **Prisma** — Provides type-safe queries, automated schema generation, and clean model relationships.
 * **Authentication**: **Clerk** — Provides robust, drop-in user sign-in/up sessions, and middleware route protection.
-* **Form & Payload Validation**: **Zod** — Enforces runtime validation schemas (such as ensuring session start time is strictly before end time) and returns clean, mapped field errors.
+* **Validation**: **Prisma** — Enforces runtime validation schemas (such as ensuring session start time is strictly before end time) and returns clean, mapped field errors.
 
 ---
 
@@ -121,12 +125,11 @@ The database schema is defined in [schema.prisma](prisma/schema.prisma) and uses
 ### ✅ Fully Working
 * **Onboarding & Role Customization**: New signups are redirected to onboarding to specify names and roles.
 * **Role Switcher**: Admin test accounts can switch roles on the fly using the interactive header dropdown.
-* **Interactive Time Picker**: Custom iOS-style scrollable time picker for trainers with AM/PM formatting.
+* **Adding Sessions**: Trainers can make sessions for different batches under them.
 * **Student Self-Marking**: Students can self-mark their attendance window-adjusted to their local browser timezone offset.
 * **Strict Sessions**: Trainers can check "Strict Mode" to enforce deadlines; student UI displays a red "Missed" button, and API/Server actions block late self-marking.
 * **Expandable Institution View**: Institutions can click any batch to expand and view a table containing a detailed session summary (sorted alphabetically by title).
 * **Live Audit Log**: Monitoring Officers can view all logged sessions system-wide, sorted alphabetically by title.
-* **Bypass Headers**: Developers/Test scripts can pass `x-bypass-user-id` to skip Clerk middleware and perform automated API integration testing.
 
 ### 🟡 Partially Done
 * *None* (all requested features and specifications have been implemented to completion).
@@ -137,4 +140,4 @@ The database schema is defined in [schema.prisma](prisma/schema.prisma) and uses
 ---
 
 ## ⏳ What I'd Do Differently With More Time
-With more time, I would implement **real-time WebSockets/SSE (Server-Sent Events)** for the Monitoring Officer's Live Session Log. Currently, live sessions require a page refresh or polling to load new check-ins. Real-time connections would allow attendance rates to update live in front of the Monitoring Officer as students mark themselves present in classrooms.
+With more time, I would implement **real-time WebSockets/SSE (Server-Sent Events)** for the Monitoring Officer's Live Session Log. Currently, live sessions require a page refresh or polling to load new check-ins. Real-time connections would allow attendance rates to update live in front of the Monitoring Officer as students mark themselves present in classrooms. Also a reminder system which can be automatically be set off when a session is starting or a trainer can manually send reminders to students for marking their attendance.

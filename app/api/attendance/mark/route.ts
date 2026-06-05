@@ -23,10 +23,15 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { sessionId } = body;
+  const { sessionId, clientOffset: bodyOffset } = body;
   if (!sessionId || typeof sessionId !== "string") {
     return Response.json({ error: "Session ID is required" }, { status: 400 });
   }
+
+  const offsetHeader = request.headers.get("x-timezone-offset");
+  const clientOffset = typeof bodyOffset === "number"
+    ? bodyOffset
+    : (offsetHeader ? Number(offsetHeader) : undefined);
 
   // Fetch session
   const session = await prisma.session.findUnique({
@@ -64,7 +69,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Compute time bounds in local system time
+  // Compute time bounds in local system time or client timezone offset
   const year = session.date.getUTCFullYear();
   const month = session.date.getUTCMonth();
   const date = session.date.getUTCDate();
@@ -72,8 +77,19 @@ export async function POST(request: Request) {
   const [startH, startM] = session.startTime.split(":").map(Number);
   const [endH, endM] = session.endTime.split(":").map(Number);
 
-  const start = new Date(year, month, date, startH, startM, 0, 0);
-  const end = new Date(year, month, date, endH, endM, 0, 0);
+  let start: Date;
+  let end: Date;
+
+  if (typeof clientOffset === "number") {
+    const startUtcMs = Date.UTC(year, month, date, startH, startM, 0, 0);
+    const endUtcMs = Date.UTC(year, month, date, endH, endM, 0, 0);
+    start = new Date(startUtcMs + clientOffset * 60 * 1000);
+    end = new Date(endUtcMs + clientOffset * 60 * 1000);
+  } else {
+    // Fallback to local server timezone
+    start = new Date(year, month, date, startH, startM, 0, 0);
+    end = new Date(year, month, date, endH, endM, 0, 0);
+  }
   const now = new Date();
 
   if (now < start) {
