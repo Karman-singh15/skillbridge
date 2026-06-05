@@ -55,7 +55,7 @@ export async function POST(
     });
 
     const url = new URL(request.url);
-    const inviteLink = `${url.origin}/api/batches/${batchId}/join?token=${code}`;
+    const inviteLink = `${url.origin}/invite/${code}`;
 
     return Response.json(
       {
