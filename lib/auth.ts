@@ -16,13 +16,17 @@ export async function getCurrentUser(request?: Request) {
 
   if (!userId) return null;
 
+  // Find user by clerkUserId
   let user = await prisma.user.findUnique({
     where: { clerkUserId: userId },
   });
 
-  user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
+  // Fallback to checking by database internal ID in dev mode (for easier test scripts referencing)
+  if (!user && (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test")) {
+    user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+  }
 
   return user;
 }
