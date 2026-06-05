@@ -34,19 +34,7 @@ All test users are registered with the standard mock password in the development
 
 | Method | Path | Access | Data | Verification |
 |---|---|---|---|---|
-| **POST** | `/api/batches` | Trainer, Institution | fetch("/api/batches", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "Test Batch",
-    code: "BATCH-1001",
-    institutionId: "cmq09dgew0003kyv9gi7cmgsp",
-  }),
-})
-  .then(res => res.json())
-  .then(console.log); | Switch the role to Institution and you will be able to see the batch |
+| **POST** | `/api/batches` | Trainer, Institution | [JSON](api-test/1.txt) | Reload the website and the batch will be under Your Batches |
 
 | **POST** | `/api/batches/[id]/invite` | Trainer | fetch("/api/batches/cmq09ndvt0004kyv9oq7ush9p/invite", {
   method: "POST",

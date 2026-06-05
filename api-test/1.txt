@@ -1,0 +1,13 @@
+fetch("/api/batches", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: "Test Batch",
+    code: "BATCH-1001",
+    institutionId: "cmq09dgew0003kyv9gi7cmgsp",
+  }),
+})
+  .then(res => res.json())
+  .then(console.log);
