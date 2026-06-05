@@ -39,12 +39,12 @@ All test users are registered with the standard mock password in the development
 | **POST** | `/api/batches/[id]/join` | Student | Change the role to Student and paste the Link generated in previous request in the browser | The batch will be in Visible in Batches Section |
 | **POST** | `/api/batches/sessions` | Trainer | [JSON](api-test/3.txt) | Refresh the page and the session will be under Scheduled Sessions |
 | **POST** | `/api/attendance/mark` | Student | [JSON](api-test/4.txt) | The Session "This will be marked present" should be marked as PRESENT in attendance records |
-| **GET** | `/sessions/:id/attendance` | Trainer | [https://skillbridge-attendance-manager.vercel.app/api/sessions/cmq0k9z41000404jrozik898m/attendance](Click-Here) | Views full attendance for a
+| **GET** | `/sessions/:id/attendance` | Trainer | https://skillbridge-attendance-manager.vercel.app/api/sessions/cmq0k9z41000404jrozik898m/attendance | Views full attendance for a
 session |
-| **GET** | `/batches/:id/summary` | Institution | [https://skillbridge-attendance-manager.vercel.app/api/batches/cmq09ndvt0004kyv9oq7ush9p/summary](Click-Here) | Views full attendance for a
+| **GET** | `/batches/:id/summary` | Institution | https://skillbridge-attendance-manager.vercel.app/api/batches/cmq09ndvt0004kyv9oq7ush9p/summary | Views full attendance for a
 batch |
-| **GET** | `/institutions/:id/summary ` | Programme Manager | [https://skillbridge-attendance-manager.vercel.app/api/institutions/cmpzz9mxd0006cmv9jklrhqf6/summary](Click-Here) | summary across all batches in an institution|
-| **GET** | `/programme/summary` | Programme Manager / Monitoring Officer | [https://skillbridge-attendance-manager.vercel.app/api/programme/summary](Click-Here) | programme-wide
+| **GET** | `/institutions/:id/summary ` | Programme Manager | https://skillbridge-attendance-manager.vercel.app/api/institutions/cmpzz9mxd0006cmv9jklrhqf6/summary | summary across all batches in an institution|
+| **GET** | `/programme/summary` | Programme Manager / Monitoring Officer | https://skillbridge-attendance-manager.vercel.app/api/programme/summary | programme-wide
 summary |
 
 ---
